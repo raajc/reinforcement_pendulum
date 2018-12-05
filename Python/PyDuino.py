@@ -9,16 +9,27 @@ def read16bit():#Function to read input from serial
     ch = int.from_bytes(ser.read(2), byteorder='big')  # Combine both bytes received over serial
     return ch
 
-def writeToSerial(toSend): #Function To Write to Arduino
-    str1 = str(toSend).encode()#Actual message being sent
-    str2 = "#".encode() #Arduino Endline Character
-    strSend = str1+str2 #Combine
+def writePWM(toSend, dir): #Function To Write to Arduino
+    if dir == "R":
+        str1 = str(toSend).encode()#Actual message being sent
+        str2 = "R".encode() #Arduino Endline Character
+        strSend = str1+str2 #Combine
 
-    ser.write(strSend) #Send
+        ser.write(strSend) #Send
+    if dir == "L":
+        str1 = str(toSend).encode()  # Actual message being sent
+        str2 = "L".encode()  # Arduino Endline Character
+        strSend = str1 + str2  # Combine
 
+        ser.write(strSend)  # Send
+
+def getEcoder(): #Function To Write to Arduino
+    ser.write("E".encode()) #Send
+    data = read16bit()
+    return data
 
 while True: #Loop to send 5000 to arduino and read it when arduino sends it back
-    writeToSerial(5000)
+    writePWM(500, "R")
     data = read16bit()
     if data:
         print(data)

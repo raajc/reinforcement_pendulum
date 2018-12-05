@@ -17,11 +17,20 @@ while(Serial.available() >0) //If there is a serial message available
     {
     inString += (char)inByte; //combine bytes
     }
-  if (inByte == '#') //MUST END PWM VALUE WITH #
+  if (inByte == 'L') //MUST END PWM VALUE WITH #
   {
     value = inString.toInt(); //Get final int value from string
     inString = ""; //clear string
   }
+    if (inByte == 'R') //MUST END PWM VALUE WITH #
+  {
+    value = inString.toInt(); //Get final int value from string
+    inString = ""; //clear string
+  }
+    if(inByte == 'E')
+    {
+        write16bit(130); //Write the value to serial
+    }
   }
 
   write16bit(value); //Write the value to serial
