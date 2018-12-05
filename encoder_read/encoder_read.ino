@@ -4,8 +4,8 @@ volatile int count = 0;
 int protectedCount = 0;
 int previousCount = 0;
 
-#define readA digitalRead(2)//faster than digitalRead()
-#define readB digitalRead(3)//faster than digitalRead()
+#define readA digitalRead(2)
+#define readB digitalRead(3)
 
 
 void setup() {
