@@ -11,8 +11,8 @@ const byte motorcoderPinB = 5;//outoutB digital pin5
 //Encoder counts
 volatile int16_t count = 0;
 volatile int16_t motor_count = 0;
-int protectedCount = 0;
-int previousCount = 0;
+int mCountPrev = 0;
+int pCountPrev = 0;
 
 //Encoder Interrupts
 #define readA digitalRead(2)
@@ -46,7 +46,7 @@ attachInterrupt(digitalPinToInterrupt(motorcoderPinA), m_isrA, CHANGE);
 attachInterrupt(digitalPinToInterrupt(motorcoderPinB), m_isrB, CHANGE);
 
 }
-
+char inByte = 0;
 void loop() 
 {
 while(Serial.available() >0) //If there is a serial message available
@@ -72,14 +72,19 @@ while(Serial.available() >0) //If there is a serial message available
     }
     if(inByte == 'E')
     {   
-      write16bit(count+32768);
+      write16bit(count+32767);
+      Serial.flush();
     }
     if(inByte == 'M')
     {   
-      write16bit(motor_count+32768);
+      write16bit(motor_count+32767);
+      Serial.flush();
     }
+
   }
+
 }
+
 
 void write16bit(int16_t ch) { //function to combine two bytes and send over serial
   Serial.write(ch>>8);
@@ -88,13 +93,13 @@ void write16bit(int16_t ch) { //function to combine two bytes and send over seri
 
 // Move cart left
 void motorL(int pwm_pinL, int pwm_pinR, int duty) {
-    analogWrite(pwm_pinL, duty);
+    analogWrite(pwm_pinL, min(250, duty));
     analogWrite(pwm_pinR, 0); 
 }
 
 void motorR(int pwm_pinL, int pwm_pinR, int duty) {
     analogWrite(pwm_pinL, 0);
-    analogWrite(pwm_pinR, duty); 
+    analogWrite(pwm_pinR, min(250, duty)); 
 }
 
 //Pendulum Encoder ISRs

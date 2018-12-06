@@ -1,7 +1,9 @@
 #Uses Serial Library
 import serial
 import time
-import keyboard
+from pytictoc import TicToc
+
+t=TicToc()
 
 ser = serial.Serial('COM20', 115200)  # Initialize serial port
 
@@ -16,51 +18,68 @@ def writePWM(toSend, dir): #Function To Write to Arduino
         str1 = str(toSend).encode()#Actual message being sent
         str2 = "R".encode() #Arduino Endline Character
         strSend = str1+str2 #Combine
-
         ser.write(strSend) #Send
+
     if dir == "L":
         str1 = str(toSend).encode()  # Actual message being sent
         str2 = "L".encode()  # Arduino Endline Character
         strSend = str1 + str2  # Combine
-
         ser.write(strSend)  # Send
+    #time.sleep(.16)
 
-def getPEncoder(): #Function To Write to Arduino
+def getPEncoderPos(): #Function To Write to Arduino
     ser.write("E".encode()) #Send
     data = read16bit()-32768
-    time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
-    return data
-def getMEncoder(): #Function To Write to Arduino
-    ser.write("M".encode()) #Send
-    data = read16bit()-32768
-    time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
+    #time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
     return data
 
-def getBothEncoder(): #Function To Write to Arduino
+def getMEncoderPos(): #Function To Write to Arduino
+    ser.write("M".encode()) #Send
+    data = read16bit()-32768
+    #time.sleep(.3) #If you get rid of this make sure you are not reading from arduino more than this
+    return data
+
+def getBothEncoderPos(): #Function To Write to Arduino
     ser.write("E".encode()) #Send
     pdata = read16bit()-32768
     ser.write("M".encode()) #Send
     mdata = read16bit()-32768
-    time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
+    #time.sleep(.3) #If you get rid of this make sure you are not reading from arduino more than this
     return pdata, mdata
 
 
-while True: #Loop to send 5000 to arduino and read it when arduino sends it back
-    pData, mData = getBothEncoder()
+Timer = 0
+period = 150
+vel = 0
+pos=0
+prevPos=0
 
-    print(pData)
-    print(mData)
+kp = 5
+kd = 0
+offset = 0
+PWM = 0
 
-    writePWM(50,"L")
-    time.sleep(1)
-    writePWM(50, "R")
-    time.sleep(1)
+t.tic()
+t.tocvalue()
+while True: #Loop to send 5000 to arduino and read it when arduino sends it bac
 
+    if(t.tocvalue()*1000 - Timer >period):
+        Timer = t.tocvalue()*1000
+        print("Timer")
+        print(Timer)
+        pos = getPEncoderPos()
+        print(pos)
+        vel = pos-prevPos
+        print(vel)
+        PWM = kp*pos+offset+kd*vel
+        print(PWM)
+        prevPos = pos
+        if (PWM>0):
+            writePWM(PWM,"L")
+        if (PWM<0):
+            writePWM((-1*PWM),"R")
 
-
-
-
-
+    #prevPos = pos
 ser.close() #Close Serial
 
 #To Do: Make these functions
