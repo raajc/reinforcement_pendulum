@@ -39,11 +39,12 @@ pinMode(encoderPinB, INPUT_PULLUP);
 attachInterrupt(digitalPinToInterrupt(encoderPinA), isrA, CHANGE);
 attachInterrupt(digitalPinToInterrupt(encoderPinB), isrB, CHANGE);
 
+digitalWrite(13, LOW);
+
 }
 
 void loop() 
 {
-        
 while(Serial.available() >0) //If there is a serial message available
   {
     char inByte = Serial.read(); //read each byte
@@ -67,12 +68,10 @@ while(Serial.available() >0) //If there is a serial message available
     }
     if(inByte == 'E')
     {   
-  write16bit(count);
+  write16bit(count+32768);
   delay(100);
     }
   }
-    //write16bit(count);
-    //delay(100);
 }
 
 void write16bit(int16_t ch) { //function to combine two bytes and send over serial

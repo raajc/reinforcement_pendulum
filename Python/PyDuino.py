@@ -2,7 +2,7 @@
 import serial
 import time
 
-ser = serial.Serial('COM19', 115200)  # Initialize serial port
+ser = serial.Serial('COM20', 115200)  # Initialize serial port
 
 print("connected to: " + ser.portstr)  # Confirm connection
 
@@ -26,17 +26,19 @@ def writePWM(toSend, dir): #Function To Write to Arduino
 
 def getEncoder(): #Function To Write to Arduino
     ser.write("E".encode()) #Send
-    data = read16bit()
+    data = read16bit()-32768
+
     return data
 
 
 while True: #Loop to send 5000 to arduino and read it when arduino sends it back
     data = getEncoder()
-    time.sleep(1)
     if (data > 0):
+        if data > 200:
+            data = 200
         writePWM(data, "R")
     if (data <= 0):
-        writePWM((-1*data), "L")
+        writePWM((data), "L")
     time.sleep(1)
 
 
