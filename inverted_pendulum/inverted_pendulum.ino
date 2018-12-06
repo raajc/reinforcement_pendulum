@@ -7,6 +7,9 @@ volatile int count = 0;
 int protectedCount = 0;
 int previousCount = 0;
 
+double kp = 15;
+double kd = 1;
+int offset = 0; //out of 255
 //Encoder Interrupts
 #define readA digitalRead(2)
 #define readB digitalRead(3)
@@ -17,8 +20,12 @@ int pwm_pinR = 7;
 
 // Variables
 int duty = 0;
-int control_loop_period = 10;
+double output = 0;
+int control_loop_period = 2;
+int readout_loop_period = 50;
 int control_loop_timer = 0;
+int readout_loop_timer = 0;
+int enter_flag = 0;
 
 void setup() {
 // PWM setup
@@ -40,22 +47,30 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   // Read Encoder
-  noInterrupts();
-  protectedCount = count;
-  interrupts();
-  
-if(control_loop_timer - millis() > control_loop_period) { 
+  //noInterrupts();
+  //protectedCount = count;
+  //interrupts();
+
+if(millis()- control_loop_timer > control_loop_period) { 
+  control_loop_timer = millis();
   // Print encoder if different from previous value
-  if (protectedCount > 0) {
-    motorL(pwm_pinL, pwm_pinR, 128);
+  if (count > 0) {
+    output = kp*(count)+offset;
+    motorL(pwm_pinL, pwm_pinR, min(output,255));
   } else {
-    motorR(pwm_pinL, pwm_pinR, 128);
+    output = -kp*(count)+offset;
+    motorR(pwm_pinL, pwm_pinR, min(output, 255));
   }
-  if(protectedCount != previousCount) {
-    Serial.println(protectedCount);
-  }
-  previousCount = protectedCount;
 }
+
+if(millis() - readout_loop_timer> readout_loop_period) { 
+  readout_loop_timer = millis();
+  Serial.print("Encoder: ");
+  Serial.print(count);
+  Serial.print(" Output: ");
+  Serial.println(min(output,255));
+}
+
 }
 
 // Move cart left
