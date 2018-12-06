@@ -7,8 +7,8 @@ volatile int count = 0;
 int protectedCount = 0;
 int previousCount = 0;
 
-double kp = 100;
-double kd = 0;
+double kp = 15;
+double kd = 1;
 int offset = 0; //out of 255
 //Encoder Interrupts
 #define readA digitalRead(2)
@@ -21,8 +21,10 @@ int pwm_pinR = 7;
 // Variables
 int duty = 0;
 double output = 0;
-int control_loop_period = 10;
+int control_loop_period = 2;
+int readout_loop_period = 50;
 int control_loop_timer = 0;
+int readout_loop_timer = 0;
 int enter_flag = 0;
 
 void setup() {
@@ -48,33 +50,27 @@ void loop() {
   //noInterrupts();
   //protectedCount = count;
   //interrupts();
-if(count < 1200 && enter_flag == 0) {
-  Serial.print("Encoder: ");
-  Serial.print(count);
-  Serial.print(" Output: ");
-  Serial.println(output);
-} else {
-enter_flag = 1;
-if(control_loop_timer - millis() > control_loop_period) { 
+
+if(millis()- control_loop_timer > control_loop_period) { 
+  control_loop_timer = millis();
   // Print encoder if different from previous value
-  if (count > 1200) {
-    output = kp*(count-1200)+offset;
+  if (count > 0) {
+    output = kp*(count)+offset;
     motorL(pwm_pinL, pwm_pinR, min(output,255));
   } else {
-    output = -kp*(count-1200)+offset;
+    output = -kp*(count)+offset;
     motorR(pwm_pinL, pwm_pinR, min(output, 255));
   }
+}
+
+if(millis() - readout_loop_timer> readout_loop_period) { 
+  readout_loop_timer = millis();
   Serial.print("Encoder: ");
   Serial.print(count);
   Serial.print(" Output: ");
   Serial.println(min(output,255));
-//  if(protectedCount != previousCount) {
-//    Serial.println(protectedCount);
-//  }
-//  previousCount = protectedCount;
 }
 
-}
 }
 
 // Move cart left
