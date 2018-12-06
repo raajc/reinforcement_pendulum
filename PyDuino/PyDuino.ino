@@ -5,25 +5,27 @@ uint16_t value = 0; //Final Input Value
 // Encoder pins
 const byte encoderPinA = 2;//outputA digital pin2
 const byte encoderPinB = 3;//outoutB digital pin3
+const byte motorcoderPinA = 4;//outputA digital pin4
+const byte motorcoderPinB = 5;//outoutB digital pin5
 
 //Encoder counts
-int16_t count = 0;
+volatile int16_t count = 0;
+volatile int16_t motor_count = 0;
 int protectedCount = 0;
 int previousCount = 0;
 
 //Encoder Interrupts
 #define readA digitalRead(2)
 #define readB digitalRead(3)
+#define motoreadA digitalRead(4)
+#define motoreadB digitalRead(5)
 
 //PWM pins
 int pwm_pinL = 6;
 int pwm_pinR = 7;
 
 // Variables
-int duty = 0;
-int control_loop_period = 10;
-int control_loop_timer = 0;
-int updateFlag = 0;
+
 
 void setup() 
 {
@@ -35,11 +37,13 @@ Serial.begin(115200); // set the baud rate
 
 pinMode(encoderPinA, INPUT_PULLUP);
 pinMode(encoderPinB, INPUT_PULLUP);
+pinMode(motorcoderPinA, INPUT_PULLUP);
+pinMode(motorcoderPinB, INPUT_PULLUP);
 
 attachInterrupt(digitalPinToInterrupt(encoderPinA), isrA, CHANGE);
 attachInterrupt(digitalPinToInterrupt(encoderPinB), isrB, CHANGE);
-
-digitalWrite(13, LOW);
+attachInterrupt(digitalPinToInterrupt(motorcoderPinA), m_isrA, CHANGE);
+attachInterrupt(digitalPinToInterrupt(motorcoderPinB), m_isrB, CHANGE);
 
 }
 
@@ -68,8 +72,11 @@ while(Serial.available() >0) //If there is a serial message available
     }
     if(inByte == 'E')
     {   
-  write16bit(count+32768);
-  delay(100);
+      write16bit(count+32768);
+    }
+    if(inByte == 'M')
+    {   
+      write16bit(motor_count+32768);
     }
   }
 }
@@ -90,6 +97,7 @@ void motorR(int pwm_pinL, int pwm_pinR, int duty) {
     analogWrite(pwm_pinR, duty); 
 }
 
+//Pendulum Encoder ISRs
 void isrA() {
   if(readB != readA) {
     count ++;
@@ -102,5 +110,21 @@ void isrB() {
     count ++;
   } else {
     count --;
+  }
+}
+
+// Motor Encoder ISRs
+void m_isrA() {
+  if(motoreadB != motoreadA) {
+    motor_count ++;
+  } else {
+    motor_count --;
+  }
+}
+void m_isrB() {
+  if (motoreadA == motoreadB) {
+    motor_count ++;
+  } else {
+    motor_count --;
   }
 }

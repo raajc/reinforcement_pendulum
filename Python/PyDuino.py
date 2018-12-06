@@ -1,6 +1,7 @@
 #Uses Serial Library
 import serial
 import time
+import keyboard
 
 ser = serial.Serial('COM20', 115200)  # Initialize serial port
 
@@ -24,21 +25,35 @@ def writePWM(toSend, dir): #Function To Write to Arduino
 
         ser.write(strSend)  # Send
 
-def getEncoder(): #Function To Write to Arduino
+def getPEncoder(): #Function To Write to Arduino
     ser.write("E".encode()) #Send
     data = read16bit()-32768
-
+    time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
     return data
+def getMEncoder(): #Function To Write to Arduino
+    ser.write("M".encode()) #Send
+    data = read16bit()-32768
+    time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
+    return data
+
+def getBothEncoder(): #Function To Write to Arduino
+    ser.write("E".encode()) #Send
+    pdata = read16bit()-32768
+    ser.write("M".encode()) #Send
+    mdata = read16bit()-32768
+    time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
+    return pdata, mdata
 
 
 while True: #Loop to send 5000 to arduino and read it when arduino sends it back
-    data = getEncoder()
-    if (data > 0):
-        if data > 200:
-            data = 200
-        writePWM(data, "R")
-    if (data <= 0):
-        writePWM((data), "L")
+    pData, mData = getBothEncoder()
+
+    print(pData)
+    print(mData)
+
+    writePWM(50,"L")
+    time.sleep(1)
+    writePWM(50, "R")
     time.sleep(1)
 
 
