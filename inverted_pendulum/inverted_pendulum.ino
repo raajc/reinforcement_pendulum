@@ -11,9 +11,13 @@ volatile int32_t motor_count = 0;
 
 double kp = 10;
 double kd = 1;
+//double ki = 0.1;
 int offset = 130; //out of 255
 int diff = 0;
 int count_prev = 0;
+//int control_iter=0;
+//int windup_thres=50;
+//int sum_count = 0;
 
 double kp_m = 0.02;
 double kd_m = 0.025;
@@ -40,6 +44,7 @@ int readout_loop_timer = 0;
 int enter_flag = 0;
 char inByte = 0;
 char control_mode = 0;
+char direction_move = 0;
 
 void setup() {
 // PWM setup
@@ -80,28 +85,35 @@ if(millis()- control_loop_timer > control_loop_period) {
   if(control_mode == 'A') {
     count = REG_TC0_CV0-600;
     // Print encoder if different from previous value
+    //sum_count += count;
     diff = count - count_prev;
-    if (count > 0 && count < 150 && abs(motor_count) < 80000) {
-      output = kp*(count)+offset+kd*diff;
-      motorL(pwm_pinL, pwm_pinR, output);
-    } else if (count <=0 && count > -150 && abs(motor_count) < 80000) {
-      output = -kp*(count)+offset+kd*diff;
-      motorR(pwm_pinL, pwm_pinR, output);
+    output = kp*(count)+kd*diff;//+ki*sum_count;
+    if (output > 0 && count < 150 && abs(motor_count) < 80000) {
+      motorL(pwm_pinL, pwm_pinR, abs(output), offset);
+    } else if (output <=0 && count > -150 && abs(motor_count) < 80000) {
+      motorR(pwm_pinL, pwm_pinR, abs(output), offset);
     } else {
-      output=0;
-      motorR(pwm_pinL, pwm_pinR, output);
+      motorStop(pwm_pinL, pwm_pinR);
     }
     count_prev = count;
+//    control_iter++;
+//    if (control_iter > windup_thres) {
+//      control_iter = 0;
+//      sum_count = 0;
+//    }
   } else if (control_mode == 'T') {
     // Print encoder if different from previous value
     err = desired_motor_count - motor_count;
     diff_m = err - err_prev;
-    if (desired_motor_count < motor_count) {
-      output = -kp_m*(err)+offset_m+kd_m*diff_m;
-      motorL(pwm_pinL, pwm_pinR, output);
+    output = kp_m*err + kd_m*diff_m;
+    if (output < 0) {
+      direction_move = 'L';
+      //output = -kp_m*(err)+offset_m-kd_m*diff_m;
+      motorL(pwm_pinL, pwm_pinR, abs(output), offset_m);
     } else {
-      output = kp_m*(err)+offset_m+kd_m*diff_m;
-      motorR(pwm_pinL, pwm_pinR, output);
+      direction_move = 'R';
+      //output = kp_m*(err)+offset_m+kd_m*diff_m;
+      motorR(pwm_pinL, pwm_pinR, abs(output), offset_m);
     } 
     err_prev = err;
   }
@@ -150,7 +162,11 @@ while(Serial.available() >0) //If there is a serial message available
   Serial.print(" Error: ");
   Serial.print(err);
   Serial.print(" Output: ");
-  Serial.print(min(output,255));
+  Serial.print(output);
+  Serial.print(" Output plus offset: ");
+  Serial.print(min(offset_m+abs(output),255));
+  Serial.print(" Direction: ");
+  Serial.print(direction_move);
   Serial.print(" Deriv: ");
   Serial.print(diff*kd);
   Serial.print(" Control Mode: ");
@@ -162,15 +178,20 @@ while(Serial.available() >0) //If there is a serial message available
 }
 
 // Move cart left
-void motorL(int pwm_pinL, int pwm_pinR, int duty) {
-    analogWrite(pwm_pinL, min(output,255));
+void motorL(int pwm_pinL, int pwm_pinR, int duty, int fric_offset) {
+    analogWrite(pwm_pinL, min(duty+fric_offset,255));
     analogWrite(pwm_pinR, 0); 
 }
 
 // Move cart right
-void motorR(int pwm_pinL, int pwm_pinR, int duty) {
+void motorR(int pwm_pinL, int pwm_pinR, int duty, int fric_offset) {
     analogWrite(pwm_pinL, 0);
-    analogWrite(pwm_pinR, min(output,255)); 
+    analogWrite(pwm_pinR, min(duty+fric_offset,255)); 
+}
+
+void motorStop(int pwm_pinL, int pwm_pinR) {
+    analogWrite(pwm_pinL, 0);
+    analogWrite(pwm_pinR, 0); 
 }
 
 // Motor Encoder ISRs
