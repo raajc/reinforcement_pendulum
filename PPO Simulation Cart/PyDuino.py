@@ -5,9 +5,9 @@ import time
 
 # t=TicToc()
 
-ser = serial.Serial('COM20', 115200)  # Initialize serial port
+# ser = serial.Serial('COM20', 115200)  # Initialize serial port
 
-print("connected to: " + ser.portstr)  # Confirm connection
+# print("connected to: " + ser.portstr)  # Confirm connection
 
 def read16bit():#Function to read input from serial
     ch = int.from_bytes(ser.read(2), byteorder='big')  # Combine both bytes received over serial
@@ -48,39 +48,39 @@ def getBothEncoderPos(): #Function To Write to Arduino
     return pdata, mdata
 
 
-Timer = 0
-period = 150
-vel = 0
-pos=0
-prevPos=0
-
-kp = 5
-kd = 0
-offset = 0
-PWM = 0
-
-t.tic()
-t.tocvalue()
-while True: #Loop to send 5000 to arduino and read it when arduino sends it bac
-
-    if(t.tocvalue()*1000 - Timer >period):
-        Timer = t.tocvalue()*1000
-        print("Timer")
-        print(Timer)
-        pos = getPEncoderPos()
-        print(pos)
-        vel = pos-prevPos
-        print(vel)
-        PWM = kp*pos+offset+kd*vel
-        print(PWM)
-        prevPos = pos
-        if (PWM>0):
-            writePWM(PWM,"L")
-        if (PWM<0):
-            writePWM((-1*PWM),"R")
-
-    #prevPos = pos
-ser.close() #Close Serial
+# Timer = 0
+# period = 150
+# vel = 0
+# pos=0
+# prevPos=0
+#
+# kp = 5
+# kd = 0
+# offset = 0
+# PWM = 0
+#
+# t.tic()
+# t.tocvalue()
+# while True: #Loop to send 5000 to arduino and read it when arduino sends it bac
+#
+#     if(t.tocvalue()*1000 - Timer >period):
+#         Timer = t.tocvalue()*1000
+#         print("Timer")
+#         print(Timer)
+#         pos = getPEncoderPos()
+#         print(pos)
+#         vel = pos-prevPos
+#         print(vel)
+#         PWM = kp*pos+offset+kd*vel
+#         print(PWM)
+#         prevPos = pos
+#         if (PWM>0):
+#             writePWM(PWM,"L")
+#         if (PWM<0):
+#             writePWM((-1*PWM),"R")
+#
+#     #prevPos = pos
+# ser.close() #Close Serial
 
 #To Do: Make these functions
     #ReadEncoder

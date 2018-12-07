@@ -5,17 +5,19 @@ import tensorflow as tf
 from policy_net import Policy_net
 from ppo import PPOTrain
 import PyDuino as PD
-
+import serial
 ITERATION = int(1e5)
 GAMMA = 0.95
+
+SERIAL_AVAILABLE = False;
 
 
 def main():
 
     # Serial port for Arduino
-    ser = serial.Serial('COM20', 115200)  # Initialize serial port
-
-    print("connected to: " + ser.portstr)  # Confirm connection
+    if (SERIAL_AVAILABLE):
+        ser = serial.Serial('COM20', 115200)  # Initialize serial port
+        print("connected to: " + ser.portstr)  # Confirm connection
 
     env = gym.make('CartPole-v0')
     env.seed(0)
@@ -59,8 +61,9 @@ def main():
                 else:
                     dir = "L"
 
-                PD.writePWM(200,dir)
-                angle = PD.getPEncoderPos()
+                if (SERIAL_AVAILABLE):
+                    PD.writePWM(200,dir)
+                    angle = PD.getPEncoderPos()
 
                 next_obs, reward, done, info = env.step(act)
                 print(next_obs)
@@ -118,6 +121,8 @@ def main():
 
             writer.add_summary(summary, iteration)
         writer.close()
+        if (SERIAL_AVAILABLE):
+            ser.close()
 
 
 if __name__ == '__main__':
