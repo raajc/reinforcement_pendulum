@@ -3,7 +3,7 @@ import copy
 
 
 class PPOTrain:
-    def __init__(self, Policy, Old_Policy, gamma=0.95, clip_value=0.2, c_1=1, c_2=0.01):
+    def __init__(self, Policy, Old_Policy, gamma=0.99, clip_value=0.2, c_1=1, c_2=0.01):
         """
         :param Policy:
         :param Old_Policy:
