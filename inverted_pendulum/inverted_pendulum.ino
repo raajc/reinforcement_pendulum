@@ -1,16 +1,25 @@
+String inString = ""; //store Input Bytes
+uint16_t value = 0; //Final Input Value
+
 // Encoder pins
 const byte motorcoderPinA = 4;//outputA digital pin4
 const byte motorcoderPinB = 5;//outoutB digital pin5
 
 //Encoder counts
 int16_t count = 0;
-volatile int motor_count = 0;
+volatile int32_t motor_count = 0;
 
 double kp = 10;
 double kd = 1;
 int offset = 130; //out of 255
 int diff = 0;
 int count_prev = 0;
+
+double kp_m = 0.02;
+double kd_m = 0.025;
+int offset_m = 132; //out of 255
+int diff_m = 0;
+int32_t desired_motor_count = 0;
 //Encoder Interrupts
 #define motoreadA digitalRead(4)
 #define motoreadB digitalRead(5)
@@ -20,14 +29,17 @@ int pwm_pinL = 6;
 int pwm_pinR = 7;
 
 // Variables
+int err = 0;
+int err_prev = 0;
 int duty = 0;
 double output = 0;
-int control_loop_period = 5;
+int control_loop_period = 1;
 int readout_loop_period = 200;
 int control_loop_timer = 0;
 int readout_loop_timer = 0;
 int enter_flag = 0;
 char inByte = 0;
+char control_mode = 0;
 
 void setup() {
 // PWM setup
@@ -64,40 +76,85 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 if(millis()- control_loop_timer > control_loop_period) { 
-  count = REG_TC0_CV0-600;
   control_loop_timer = millis();
-  // Print encoder if different from previous value
-  diff = count - count_prev;
-  if (count > 0 && count < 150 && abs(motor_count) < 80000) {
-    output = kp*(count)+offset+kd*diff;
-    motorL(pwm_pinL, pwm_pinR, output);
-  } else if (count <=0 && count > -150 && abs(motor_count) < 80000) {
-    output = -kp*(count)+offset+kd*diff;
-    motorR(pwm_pinL, pwm_pinR, output);
-  } else {
-    output=0;
-    motorR(pwm_pinL, pwm_pinR, output);
+  if(control_mode == 'A') {
+    count = REG_TC0_CV0-600;
+    // Print encoder if different from previous value
+    diff = count - count_prev;
+    if (count > 0 && count < 150 && abs(motor_count) < 80000) {
+      output = kp*(count)+offset+kd*diff;
+      motorL(pwm_pinL, pwm_pinR, output);
+    } else if (count <=0 && count > -150 && abs(motor_count) < 80000) {
+      output = -kp*(count)+offset+kd*diff;
+      motorR(pwm_pinL, pwm_pinR, output);
+    } else {
+      output=0;
+      motorR(pwm_pinL, pwm_pinR, output);
+    }
+    count_prev = count;
+  } else if (control_mode == 'T') {
+    // Print encoder if different from previous value
+    err = desired_motor_count - motor_count;
+    diff_m = err - err_prev;
+    if (desired_motor_count < motor_count) {
+      output = -kp_m*(err)+offset_m+kd_m*diff_m;
+      motorL(pwm_pinL, pwm_pinR, output);
+    } else {
+      output = kp_m*(err)+offset_m+kd_m*diff_m;
+      motorR(pwm_pinL, pwm_pinR, output);
+    } 
+    err_prev = err;
   }
-  count_prev = count;
 }
 
 if(millis() - readout_loop_timer> readout_loop_period) {
   count = REG_TC0_CV0-600;
-//  while(Serial.available() > 0) {
-//    char inByte = Serial.read();
-//    if(inByte == 'R') {
-//      REG_TC0_CV0 = -600;
-//    }
-//  }
+while(Serial.available() >0) //If there is a serial message available
+  {
+    char inByte = Serial.read(); //read each byte
+    if(isDigit(inByte))//if the byte is a number
+    {
+    inString += (char)inByte; //combine bytes
+    }
+    if (inByte == 'P') //MUST END PWM VALUE WITH #
+    {
+      long int value = min(inString.toInt(),75000); //Get final int value from string
+      inString = ""; //clear string
+      desired_motor_count = value;
+      control_mode = 'T';
+      inByte = 0;
+    }
+    if (inByte == 'N') //MUST END PWM VALUE WITH #
+    {
+      long int value = min(inString.toInt(),75000); //Get final int value from string
+      inString = ""; //clear string
+      desired_motor_count = -value;
+      control_mode = 'T';
+      inByte = 0;
+    }
+    if (inByte == 'A') //MUST END PWM VALUE WITH #
+    {
+      //value = inString.toInt(); //Get final int value from string
+      inString = ""; //clear string
+      control_mode = 'A';
+      inByte = 0;
+    }
+  }
   readout_loop_timer = millis();
   Serial.print("Encoder: ");
   Serial.print(count);
   Serial.print(" Motor: ");
   Serial.print(motor_count);
+  Serial.print(" Desired Motor: ");
+  Serial.print(desired_motor_count);
+  Serial.print(" Error: ");
+  Serial.print(err);
   Serial.print(" Output: ");
   Serial.print(min(output,255));
   Serial.print(" Deriv: ");
   Serial.print(diff*kd);
+  Serial.print(" Control Mode: ");
+  Serial.print(control_mode);
   Serial.print(" Prop: ");
   Serial.println(output-diff*kd);
 }
