@@ -4,12 +4,19 @@ import numpy as np
 import tensorflow as tf
 from policy_net import Policy_net
 from ppo import PPOTrain
+import PyDuino as PD
 
 ITERATION = int(1e5)
 GAMMA = 0.95
 
 
 def main():
+
+    # Serial port for Arduino
+    ser = serial.Serial('COM20', 115200)  # Initialize serial port
+
+    print("connected to: " + ser.portstr)  # Confirm connection
+
     env = gym.make('CartPole-v0')
     env.seed(0)
     ob_space = env.observation_space
@@ -46,8 +53,17 @@ def main():
 
                 env.render()
 
-                next_obs, reward, done, info = env.step(act)
 
+                if (act == 1):
+                    dir = "R";
+                else:
+                    dir = "L"
+
+                PD.writePWM(200,dir)
+                angle = PD.getPEncoderPos()
+
+                next_obs, reward, done, info = env.step(act)
+                print(next_obs)
                 if done:
                     v_preds_next = v_preds[1:] + [0]  # next state of terminate state has 0 state value
                     obs = env.reset()
