@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0666e9d8-ed26-4274-8a1f-e54151d80902" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/log/train/events.out.tfevents.1544250832.d142-058-216-084.wireless.sfu.ca" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/log/train/events.out.tfevents.1544250832.d142-058-216-084.wireless.sfu.ca" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/model/checkpoint" afterDir="false" />
-    </list>
+    <list default="true" id="0666e9d8-ed26-4274-8a1f-e54151d80902" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
