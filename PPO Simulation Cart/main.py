@@ -28,7 +28,7 @@ def main():
     reward_disc = 5
     # Serial port for Arduino
     if (SERIAL_AVAILABLE):
-        ser = serial.Serial('/dev/tty.usbmodem143201', 115200)  # Initialize serial port
+        ser = serial.Serial('COM20', 115200)  # Initialize serial port
         print("connected to: " + ser.portstr)  # Confirm connection
 
     env = gym.make('CartPole-v0')
@@ -91,22 +91,24 @@ def main():
 
                 m = (reward_max - reward_min) / (reward_disc - angle_thres_deg)
                 # reward = min(m*(abs(angle_deg)-reward_disc) + reward_max, reward_max)
-                reward = 1
+                #reward = 1
+                reward = ((.9/7) * (min((6 - abs(angle_deg)), (1)))+6) + ((0.1/6)*(min((5 - abs((cart/1000))), (1)) + 5))
 
                 # next_obs = [angle angle_velocity cart cart_velocoty]
                 # print(next_obs)
 
                 next_obs = [angle, angle_velocity, cart, cart_velocity]
-                print("angle = ", angle_deg)
+                #print("angle = ", angle_deg)
+                print("x: ", PD.getMEncoderPos(ser))
                 if abs(angle_deg) > angle_thres_deg:
                     v_preds_next = v_preds[1:] + [0]  # next state of terminate state has 0 state value
-                    print(sum(rewards))
+                    print("reward: ", sum(rewards))
                     obs = env.reset()
                     reward = -1
-                    print(iteration)
+                    print("Iteration: ", iteration)
                     print('Waiting to reset')
                     PD.writePWM(ser, 0, dir)
-                    saver.save(sess, "./model/model_iter_{:d}_rewards_{:d}.ckpt".format(iteration, sum(rewards)))
+                    saver.save(sess, "./model/model_iter_{:d}_rewards_{:d}.ckpt".format(iteration, int(sum(rewards))))
                     print('Clear!! Model saved.')
                     while(angle_deg > 1 or angle_deg < -1):
                         time.sleep(0.1)

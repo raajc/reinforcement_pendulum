@@ -42,6 +42,7 @@ pinMode(motorcoderPinB, INPUT_PULLUP);
 
 attachInterrupt(digitalPinToInterrupt(encoderPinA), isrA, CHANGE);
 attachInterrupt(digitalPinToInterrupt(encoderPinB), isrB, CHANGE);
+
 attachInterrupt(digitalPinToInterrupt(motorcoderPinA), m_isrA, CHANGE);
 attachInterrupt(digitalPinToInterrupt(motorcoderPinB), m_isrB, CHANGE);
 
