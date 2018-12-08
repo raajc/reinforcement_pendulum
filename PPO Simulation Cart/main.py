@@ -92,7 +92,7 @@ def main():
                 m = (reward_max - reward_min) / (reward_disc - angle_thres_deg)
                 # reward = min(m*(abs(angle_deg)-reward_disc) + reward_max, reward_max)
                 #reward = 1
-                reward = ((.9/7) * (min((6 - abs(angle_deg)), (1)))+6) + ((0.1/6)*(min((5 - abs((cart/1000))), (1)) + 5))
+                reward = ((.9/7) * (min((6 - abs(angle_deg)), (1)))+6) + ((0.1/3)*(min((2 - abs((cart/1000))), (1)) + 2))
 
                 # next_obs = [angle angle_velocity cart cart_velocoty]
                 # print(next_obs)
