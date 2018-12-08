@@ -4,13 +4,6 @@
     <list default="true" id="0666e9d8-ed26-4274-8a1f-e54151d80902" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/checkpoint" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/model.ckpt.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/model.ckpt.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/model.ckpt.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/model_iter_0_rewards_0.ckpt.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/model_iter_0_rewards_0.ckpt.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/model/model_iter_0_rewards_0.ckpt.meta" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

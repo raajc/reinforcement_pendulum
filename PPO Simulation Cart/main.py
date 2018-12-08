@@ -28,9 +28,13 @@ def main():
     reward_max = 5
     reward_min = -5
     reward_disc = 5
+    pwm_index = 1
+    pwm_list = [("L", 180), ("L", 170), ("L", 160), ("L", 0), ("R", 160), ("R", 170), ("R", 180)]
+    pwm_list = [("L", 180), ("L", 0), ("R", 180)]
+    pwm_list_size = 3
     # Serial port for Arduino
     if (SERIAL_AVAILABLE):
-        ser = serial.Serial('/dev/tty.usbmodem143201', 115200)  # Initialize serial port
+        ser = serial.Serial('/dev/tty.usbmodem143401', 115200)  # Initialize serial port
         print("connected to: " + ser.portstr)  # Confirm connection
 
     env = gym.make('CartPole-v0')
@@ -74,11 +78,16 @@ def main():
                 # env.render()
 
                 if (act == 1):
-                    dir = "R";
-                    pwm += 10;
+                    if pwm_index < pwm_list_size-1:
+                        pwm_index += 1
                 else:
-                    dir = "L"
-                    pwm -= 10;
+                    if pwm_index > 0:
+                        pwm_index -= 1
+
+                dir = pwm_list[pwm_index][0]
+                pwm = pwm_list[pwm_index][1]
+                print(dir)
+                print(pwm)
 
                 if (SERIAL_AVAILABLE):
                     PD.writePWM(ser,180,dir)

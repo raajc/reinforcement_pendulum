@@ -1,0 +1,6 @@
+model_checkpoint_path: "model_iter_50_rewards_49.ckpt"
+all_model_checkpoint_paths: "model_iter_10_rewards_78.ckpt"
+all_model_checkpoint_paths: "model_iter_20_rewards_83.ckpt"
+all_model_checkpoint_paths: "model_iter_30_rewards_52.ckpt"
+all_model_checkpoint_paths: "model_iter_40_rewards_107.ckpt"
+all_model_checkpoint_paths: "model_iter_50_rewards_49.ckpt"
