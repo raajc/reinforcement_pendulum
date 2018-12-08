@@ -1,11 +1,11 @@
 #Uses Serial Library
 import serial
 import time
-# from pytictoc import TicToc
+from pytictoc import TicToc
 
-# t=TicToc()
+t=TicToc()
 
-ser = serial.Serial('COM20', 115200)  # Initialize serial port
+ser = serial.Serial('/dev/tty.usbmodem141201', 115200)  # Initialize serial port
 
 print("connected to: " + ser.portstr)  # Confirm connection
 
@@ -79,7 +79,7 @@ while True: #Loop to send 5000 to arduino and read it when arduino sends it bac
         if (PWM<0):
             writePWM((-1*PWM),"R")
 
-    #prevPos = pos
+    prevPos = pos
 ser.close() #Close Serial
 
 #To Do: Make these functions

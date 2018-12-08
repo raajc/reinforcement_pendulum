@@ -9,11 +9,11 @@ import time
 
 # print("connected to: " + ser.portstr)  # Confirm connection
 
-def read16bit():#Function to read input from serial
+def read16bit(ser):#Function to read input from serial
     ch = int.from_bytes(ser.read(2), byteorder='big')  # Combine both bytes received over serial
     return ch
 
-def writePWM(toSend, dir): #Function To Write to Arduino
+def writePWM(ser, toSend, dir): #Function To Write to Arduino
     if dir == "R":
         str1 = str(toSend).encode()#Actual message being sent
         str2 = "R".encode() #Arduino Endline Character
@@ -27,23 +27,23 @@ def writePWM(toSend, dir): #Function To Write to Arduino
         ser.write(strSend)  # Send
     #time.sleep(.16)
 
-def getPEncoderPos(): #Function To Write to Arduino
+def getPEncoderPos(ser): #Function To Write to Arduino
     ser.write("E".encode()) #Send
-    data = read16bit()-32768
+    data = read16bit(ser)-32768
     #time.sleep(.16) #If you get rid of this make sure you are not reading from arduino more than this
     return data
 
-def getMEncoderPos(): #Function To Write to Arduino
+def getMEncoderPos(ser): #Function To Write to Arduino
     ser.write("M".encode()) #Send
-    data = read16bit()-32768
+    data = read16bit(ser)-32768
     #time.sleep(.3) #If you get rid of this make sure you are not reading from arduino more than this
     return data
 
-def getBothEncoderPos(): #Function To Write to Arduino
+def getBothEncoderPos(ser): #Function To Write to Arduino
     ser.write("E".encode()) #Send
-    pdata = read16bit()-32768
+    pdata = read16bit(ser)-32768
     ser.write("M".encode()) #Send
-    mdata = read16bit()-32768
+    mdata = read16bit(ser)-32768
     #time.sleep(.3) #If you get rid of this make sure you are not reading from arduino more than this
     return pdata, mdata
 
