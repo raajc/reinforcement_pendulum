@@ -15,7 +15,9 @@ ITERATION = int(1e5)
 GAMMA = 0.95
 ser = 0
 SERIAL_AVAILABLE = True
-
+LOAD = False
+load_iteration = 6
+load_rewards = 455
 t=TicToc()
 
 def main():
@@ -40,8 +42,12 @@ def main():
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
+        if LOAD:
+            saver.restore(sess, "./model/model_iter_{:d}_rewards_{:d}.ckpt".format(load_iteration, load_rewards))
+        else:
+            sess.run(tf.global_variables_initializer())  # remove me if loading save
+
         writer = tf.summary.FileWriter('./log/train', sess.graph)
-        sess.run(tf.global_variables_initializer()) #remove me if loading save
         obs = env.reset()
         reward = 0
         success_num = 0
@@ -69,8 +75,10 @@ def main():
 
                 if (act == 1):
                     dir = "R";
+                    pwm += 10;
                 else:
                     dir = "L"
+                    pwm -= 10;
 
                 if (SERIAL_AVAILABLE):
                     PD.writePWM(ser,180,dir)
@@ -106,9 +114,10 @@ def main():
                     print(iteration)
                     print('Waiting to reset')
                     PD.writePWM(ser, 0, dir)
-                    saver.save(sess, "./model/model_iter_{:d}_rewards_{:d}.ckpt".format(iteration, sum(rewards)))
-                    print('Clear!! Model saved.')
-                    while(angle_deg > 1 or angle_deg < -1):
+                    if iteration % 10 == 0:
+                        saver.save(sess, "./model/model_iter_{:d}_rewards_{:d}.ckpt".format(iteration, sum(rewards)))
+                        print('Scoot scoot!! Model saved.')
+                    while(angle_deg > 1.5 or angle_deg < -1.5):
                         time.sleep(0.1)
                         angle_deg = PD.getPEncoderPos(ser) * 360 / 1200
                     print('Entered iteration {:1f}'.format(iteration+1))
