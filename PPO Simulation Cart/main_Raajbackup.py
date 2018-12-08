@@ -78,16 +78,20 @@ def main():
                 # env.render()
 
                 if (act == 1):
-                    if pwm_index < pwm_list_size-1:
-                        pwm_index += 1
+                    dir = 'L'
+                    pwm = 180
+                    # if pwm_index < pwm_list_size-1:
+                    #     pwm_index += 1
                 else:
-                    if pwm_index > 0:
-                        pwm_index -= 1
+                    dir = 'R'
+                    pwm = 180
+                    # if pwm_index > 0:
+                    #     pwm_index -= 1
 
-                dir = pwm_list[pwm_index][0]
-                pwm = pwm_list[pwm_index][1]
-                print(dir)
-                print(pwm)
+                # dir = pwm_list[pwm_index][0]
+                # pwm = pwm_list[pwm_index][1]
+                # print(dir)
+                # print(pwm)
 
                 if (SERIAL_AVAILABLE):
                     PD.writePWM(ser,180,dir)
