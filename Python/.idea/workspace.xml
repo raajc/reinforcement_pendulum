@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0666e9d8-ed26-4274-8a1f-e54151d80902" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../PPO Simulation Cart/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/../PPO Simulation Cart/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,7 +15,7 @@
     <session id="-1172770193">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.0" value="2" />
           <entry key="project.opened" value="2" />
         </counts>
@@ -73,7 +73,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
+  <component name="ProjectFrameBounds">
     <option name="x" value="140" />
     <option name="y" value="23" />
     <option name="width" value="1510" />
@@ -157,15 +157,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="140" y="23" width="1510" height="936" extended-state="1" />
-    <editor active="true" />
+    <frame x="140" y="23" width="1510" height="936" extended-state="0" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24983211" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49899262" visible="true" weight="0.32938388" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49899262" weight="0.32938388" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
