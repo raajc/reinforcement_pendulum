@@ -16,7 +16,7 @@ ITERATION = int(1e5)
 GAMMA = 0.95
 ser = 0
 SERIAL_AVAILABLE = True
-LOAD = True
+LOAD = False
 load_iteration = 110
 load_rewards = 540
 t=TicToc()
@@ -51,7 +51,7 @@ def main():
 
     with tf.Session() as sess:
         if LOAD:
-            saver.restore(sess, "./model2/model_iter_{:d}_rewards_{:d}.ckpt".format(load_iteration, load_rewards))
+            saver.restore(sess, "./model3/model_iter_{:d}_rewards_{:d}.ckpt".format(load_iteration, load_rewards))
             print("Loaded File with iteration {:d} and rewards{:d}".format(load_iteration, load_rewards))
         else:
             sess.run(tf.global_variables_initializer())  # remove me if loading save
@@ -121,19 +121,21 @@ def main():
 
                 m = (reward_max - reward_min) / (reward_disc - angle_thres_deg)
                 # reward = min(m*(abs(angle_deg)-reward_disc) + reward_max, reward_max)
-                #reward = 1
-                reward = ((.9/7) * (min((6 - abs(angle_deg)), (1)))+6) + ((0.1/3)*(min((2 - abs((cart/1000))), (1)) + 2))
+                reward = 1
+                #reward = ((.9/7) * (min((6 - abs(angle_deg)), (1)))+6) + ((0.1/3)*(min((2 - abs((cart/1000))), (1)) + 2))
 
                 # next_obs = [angle angle_velocity cart cart_velocoty]
                 # print(next_obs)
 
                 next_obs = [angle, angle_velocity, cart, cart_velocity]
+                #next_obs = [angle, angle_velocity]
                 #print("angle = ", angle_deg)
                 # print("x: ", PD.getMEncoderPos(ser))
                 if abs(angle_deg) > angle_thres_deg:
                     v_preds_next = v_preds[1:] + [0]  # next state of terminate state has 0 state value
                     print("reward: ", sum(rewards))
                     obs = env.reset()
+                    #obs = []
                     reward = -1
                     print("Iteration: ", iteration)
                     print('Waiting to reset')
