@@ -1,4 +1,6 @@
 import gym
+from gym import spaces, logger
+from gym.utils import seeding
 import numpy as np
 import tensorflow as tf
 
@@ -12,15 +14,15 @@ class Policy_net:
         """
 
         ob_space = env.observation_space
-        act_space = env.action_space
+        act_space = spaces.Discrete(7)
 
         with tf.variable_scope(name):
             self.obs = tf.placeholder(dtype=tf.float32, shape=[None] + list(ob_space.shape), name='obs')
 
             with tf.variable_scope('policy_net'):
-                layer_1 = tf.layers.dense(inputs=self.obs, units=20, activation=tf.nn.relu)
-                layer_2 = tf.layers.dense(inputs=layer_1, units=20, activation=tf.nn.relu)
-                layer_3 = tf.layers.dense(inputs=layer_2, units=act_space.n, activation=tf.nn.relu)
+                layer_1 = tf.layers.dense(inputs=self.obs, units=20, activation=tf.tanh)
+                layer_2 = tf.layers.dense(inputs=layer_1, units=20, activation=tf.tanh)
+                layer_3 = tf.layers.dense(inputs=layer_2, units=act_space.n, activation=tf.tanh)
                 self.act_probs = tf.layers.dense(inputs=tf.divide(layer_3, temp), units=act_space.n, activation=tf.nn.softmax)
 
             with tf.variable_scope('value_net'):

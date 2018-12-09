@@ -1,2 +1,6 @@
-model_checkpoint_path: "model_iter_0_rewards_0.ckpt"
-all_model_checkpoint_paths: "model_iter_0_rewards_0.ckpt"
+model_checkpoint_path: "model_iter_1000_rewards_723.ckpt"
+all_model_checkpoint_paths: "model_iter_960_rewards_744.ckpt"
+all_model_checkpoint_paths: "model_iter_970_rewards_892.ckpt"
+all_model_checkpoint_paths: "model_iter_980_rewards_771.ckpt"
+all_model_checkpoint_paths: "model_iter_990_rewards_1168.ckpt"
+all_model_checkpoint_paths: "model_iter_1000_rewards_723.ckpt"

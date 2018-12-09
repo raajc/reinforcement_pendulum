@@ -9,16 +9,22 @@ import PyDuino as PD
 import serial
 from pytictoc import TicToc
 import time
+import winsound
 
 
 ITERATION = int(1e5)
 GAMMA = 0.95
 ser = 0
 SERIAL_AVAILABLE = True
-
+LOAD = True
+load_iteration = 110
+load_rewards = 540
 t=TicToc()
 
+
 def main():
+    frequency = 1000  # Set Frequency To 2500 Hertz
+    duration = 300  # Set Duration To 1000 ms == 1 second
     angle = 0.0
     angle_thres_deg = 15
     cart = 0.0
@@ -26,6 +32,10 @@ def main():
     reward_max = 5
     reward_min = -5
     reward_disc = 5
+    pwm_index = 1
+    pwm_list = [("L", 220), ("L", 200), ("L", 170), ("L", 0), ("R", 170), ("R", 200), ("R", 220)]
+    #pwm_list = [("L", 180), ("L", 0), ("R", 180)]
+    pwm_list_size = 7
     # Serial port for Arduino
     if (SERIAL_AVAILABLE):
         ser = serial.Serial('COM20', 115200)  # Initialize serial port
@@ -40,8 +50,13 @@ def main():
     saver = tf.train.Saver()
 
     with tf.Session() as sess:
+        if LOAD:
+            saver.restore(sess, "./model2/model_iter_{:d}_rewards_{:d}.ckpt".format(load_iteration, load_rewards))
+            print("Loaded File with iteration {:d} and rewards{:d}".format(load_iteration, load_rewards))
+        else:
+            sess.run(tf.global_variables_initializer())  # remove me if loading save
+
         writer = tf.summary.FileWriter('./log/train', sess.graph)
-        sess.run(tf.global_variables_initializer()) #remove me if loading save
         obs = env.reset()
         reward = 0
         success_num = 0
@@ -67,13 +82,28 @@ def main():
 
                 # env.render()
 
-                if (act == 1):
-                    dir = "R";
-                else:
-                    dir = "L"
+                # if (act == 1):
+                #     dir = "R";
+                # else:
+                #     dir = "L"
+                # print("Action: ", act)
+
+                # if (act == 1):
+                #     if pwm_index < pwm_list_size - 1:
+                #         pwm_index += 1
+                # else:
+                #     if pwm_index > 0:
+                #         pwm_index -= 1
+                if act>=pwm_list_size:
+                    print("Act exceeded! Act: {:d}".format(act))
+                    act = 3
+                dir = pwm_list[act][0]
+                pwm = pwm_list[act][1]
+                # print(dir)
+                # print(pwm)
 
                 if (SERIAL_AVAILABLE):
-                    PD.writePWM(ser,180,dir)
+                    PD.writePWM(ser,pwm,dir)
 
                     last_angle = angle
                     angle_deg = PD.getPEncoderPos(ser)*360/1200 # convert encoder counts (1200) to degrees
@@ -99,7 +129,7 @@ def main():
 
                 next_obs = [angle, angle_velocity, cart, cart_velocity]
                 #print("angle = ", angle_deg)
-                print("x: ", PD.getMEncoderPos(ser))
+                # print("x: ", PD.getMEncoderPos(ser))
                 if abs(angle_deg) > angle_thres_deg:
                     v_preds_next = v_preds[1:] + [0]  # next state of terminate state has 0 state value
                     print("reward: ", sum(rewards))
@@ -108,11 +138,13 @@ def main():
                     print("Iteration: ", iteration)
                     print('Waiting to reset')
                     PD.writePWM(ser, 0, dir)
-                    saver.save(sess, "./model/model_iter_{:d}_rewards_{:d}.ckpt".format(iteration, int(sum(rewards))))
-                    print('Clear!! Model saved.')
+                    if iteration % 10 == 0:
+                        saver.save(sess, "./model2/model_iter_{:d}_rewards_{:d}.ckpt".format(iteration, int(sum(rewards))))
+                        print('Clear!! Model saved.')
                     while(angle_deg > 1 or angle_deg < -1):
                         time.sleep(0.1)
                         angle_deg = PD.getPEncoderPos(ser) * 360 / 1200
+                    winsound.Beep(frequency, duration)
                     print('Entered iteration {:1f}'.format(iteration+1))
                     break
                 else:
@@ -123,7 +155,7 @@ def main():
             writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='episode_reward', simple_value=sum(rewards))])
                                , iteration)
 
-            if sum(rewards) >= 195:
+            if sum(rewards) >= 1000:
                 success_num += 1
                 if success_num >= 100:
                     saver.save(sess, './model/model.ckpt')
